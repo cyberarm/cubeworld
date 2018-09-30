@@ -1,3 +1,6 @@
+require "time"
+require "securerandom"
+
 require "gosu"
 require "perlin"
 

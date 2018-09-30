@@ -21,7 +21,7 @@ class CubeWorld
       when DIRT
         {color: Gosu::Color.rgb(127, 64, 0)}
       when WOOD
-        {color: Gosu::Color::PINK}
+        {color: Gosu::Color.rgb(255, 127, 0)}
       when LEAF
         {color: Gosu::Color::RED}
       else

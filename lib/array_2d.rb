@@ -7,7 +7,7 @@ class CubeWorld
     def all(&block)
       @array.each do |x|
         x.each do |y|
-          yield(y)
+          yield(y) if y != nil
         end
       end
     end
@@ -25,6 +25,11 @@ class CubeWorld
     end
 
     def exist?(x, y)
+      begin
+        return @array[x][y]
+      rescue
+        return false
+      end
     end
 
     def get(x, y)

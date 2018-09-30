@@ -1,30 +1,35 @@
 class CubeWorld
+
   class WorldGenerator
-    def initialize(seed: rand(10_000..99_999), chunk_size: 8, width: 4, height: 4)
+    attr_reader :seed, :chunk_size, :block_size, :width, :height, :chunks
+
+    def initialize(seed: SecureRandom.hex(64).to_i, chunk_size: 16, block_size: 4, width: 4, height: 4)
+      # DateTime.now.strftime("%Q").to_i #
       @seed = seed
       @chunk_size = chunk_size
+      @block_size = block_size
       @width = width
       @height = height
 
       @interval = 1
-      @persistence, @octaves = 1.0, 1
+      @persistence, @octaves = rand(0.0..1.0), rand(1.0..100.0)
       @generator = Perlin::Generator.new(@seed, @persistence, @octaves)
 
       @chunks = Array2D.new
 
-      @kp = 1.0
+      @kp = 100.0
 
-      puts "WorldGenerator Seed: #{seed}"
+      puts "WorldGenerator Seed: #{seed}, Persistence: #{@persistence}, Octaves: #{@octaves}"
 
-      width.times do |x|
-        height.times do |y|
-          generate_chunk(x, y)
-        end
-      end
+      # width.times do |x|
+      #   height.times do |y|
+      #     generate_chunk(x, y)
+      #   end
+      # end
     end
 
     def generate_chunk(x, y)
-      chunk = Chunk.new(x, y, @chunk_size)
+      chunk = Chunk.new(x, y, @chunk_size, @block_size)
       noise = @generator.chunk(x / @kp, y / @kp, @chunk_size, @chunk_size, @interval) do |n, _x, _y|
         # p "#{_x.round}:#{_y.round} -> #{n}"
         chunk.add_block(_x.round, _y.round, n)
@@ -41,17 +46,20 @@ class CubeWorld
   end
 
   class Chunk
-    def initialize(x, y, chunk_size)
+    def initialize(x, y, chunk_size, block_size)
       @x,@y = x,y
-      @block_size = 16
       @blocks = Array2D.new(chunk_size, chunk_size)
+
       @chunk_size = chunk_size
+      @block_size = block_size
+
+      @image = nil
     end
 
     def add_block(x, y, noise)
       type = Block::DIRT
 
-      if noise <= -1.0
+      if noise <= -0.0
         type = Block::WOOD#Block::AIR
       elsif noise < 0.5
         type = Block::GRASS
@@ -67,17 +75,24 @@ class CubeWorld
     end
 
     def draw
-      @blocks.width.times do |x|
-        @blocks.height(x).times do |y|
-          begin
-            color = Block.from_id(@blocks.get(x, y))[:color]
-          rescue RuntimeError
-            next
-          end
+      Gosu.translate(@x*(@block_size*@chunk_size), @y*(@block_size*@chunk_size)) do
 
-          Gosu.draw_rect(x*(@block_size), y*(@block_size), @block_size, @block_size, color)
+        @image ||= Gosu.record(@block_size*@chunk_size, @block_size*@chunk_size) do
+          @blocks.width.times do |x|
+            @blocks.height(x).times do |y|
+              begin
+                color = Block.from_id(@blocks.get(x, y))[:color]
+              rescue RuntimeError
+                next
+              end
+
+              Gosu.draw_rect(x*@block_size, y*@block_size, @block_size, @block_size, color)
+            end
+          end
         end
       end
+
+      @image.draw(@x*(@block_size*@chunk_size), @y*(@block_size*@chunk_size), 0)
     end
   end
 end
