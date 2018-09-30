@@ -3,33 +3,37 @@ class CubeWorld
   class WorldGenerator
     attr_reader :seed, :chunk_size, :block_size, :width, :height, :chunks
 
-    def initialize(seed: SecureRandom.hex(64).to_i, chunk_size: 16, block_size: 4, width: 4, height: 4)
+    def initialize(seed: SecureRandom.hex(2), chunk_size: 16, block_size: 4, width: 4, height: 4)
       # DateTime.now.strftime("%Q").to_i #
-      @seed = seed
+      p seed
+      @seed = seed.hex
+      raise "Seed was < 1!" if @seed < 1
+
       @chunk_size = chunk_size
       @block_size = block_size
       @width = width
       @height = height
 
       @interval = 1
-      @persistence, @octaves = rand(0.0..1.0), rand(1.0..100.0)
+      @persistence, @octaves = rand(0.5..1.0), rand(1.0..10.0)
       @generator = Perlin::Generator.new(@seed, @persistence, @octaves)
 
       @chunks = Array2D.new
 
-      @kp = 100.0
+      @kp = 1.0
 
-      puts "WorldGenerator Seed: #{seed}, Persistence: #{@persistence}, Octaves: #{@octaves}"
-
-      # width.times do |x|
-      #   height.times do |y|
-      #     generate_chunk(x, y)
-      #   end
-      # end
+      puts "WorldGenerator Seed: #{@seed}, Persistence: #{@persistence}, Octaves: #{@octaves}"
     end
 
     def generate_chunk(x, y)
       chunk = Chunk.new(x, y, @chunk_size, @block_size)
+
+      @persistence, @octaves = rand(0.5..1.0), rand(1.0..10.0)
+      @seed+=1
+      @generator = Perlin::Generator.new(@seed, @persistence, @octaves)
+      puts "WorldGenerator Seed: #{@seed}, Persistence: #{@persistence}, Octaves: #{@octaves}"
+
+
       noise = @generator.chunk(x / @kp, y / @kp, @chunk_size, @chunk_size, @interval) do |n, _x, _y|
         # p "#{_x.round}:#{_y.round} -> #{n}"
         chunk.add_block(_x.round, _y.round, n)
