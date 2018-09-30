@@ -63,11 +63,7 @@ class CubeWorld
         type = Block::DIRT
       end
 
-      begin
-        @blocks.set(x, y, type)
-      # rescue => e
-        # p e
-      end
+      @blocks.set(x, y, type)
     end
 
     def draw
@@ -79,7 +75,7 @@ class CubeWorld
             next
           end
 
-          Gosu.draw_rect(x*(@x*@block_size), y*(@y*@block_size), @block_size, @block_size, color)
+          Gosu.draw_rect(x*(@block_size), y*(@block_size), @block_size, @block_size, color)
         end
       end
     end
