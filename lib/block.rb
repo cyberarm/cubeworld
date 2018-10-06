@@ -15,13 +15,13 @@ class CubeWorld
       when WATER
         {color: Gosu::Color::BLUE}
       when SAND
-        {color: Gosu::Color::GRAY}
-      when GRASS
-        {color: Gosu::Color::GREEN}
-      when DIRT
-        {color: Gosu::Color.rgb(127, 64, 0)}
-      when WOOD
         {color: Gosu::Color.rgb(255, 127, 0)}
+      when GRASS
+        {color: Gosu::Color.rgb(25, 170, 25)}
+      when DIRT
+        {color: Gosu::Color.rgb(100, 48, 0)}
+      when WOOD
+        {color: Gosu::Color.rgb(127, 64, 32)}
       when LEAF
         {color: Gosu::Color::RED}
       else

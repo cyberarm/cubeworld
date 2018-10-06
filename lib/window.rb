@@ -17,6 +17,8 @@ class CubeWorld
     end
 
     def draw
+      Gosu.draw_rect(self.mouse_x-2, self.mouse_y-2, 4, 4, Gosu::Color::RED, Float::INFINITY) if @_x && @_y
+
       @font.draw_text("FPS: #{Gosu.fps}", 5, 5, 10, 1,1, Gosu::Color::RED)
       @font.draw_text("FPS: #{Gosu.fps}", 5.5, 5.5, 10, 1,1, Gosu::Color::WHITE)
       @font.draw_text("FPS: #{Gosu.fps}", 6, 6, 10, 1,1, Gosu::Color::BLUE)
@@ -28,11 +30,10 @@ class CubeWorld
     end
 
     def chunk_it
-      x = (mouse_x/(@world_generator.chunk_size*@world_generator.block_size)).round
-      y = (mouse_y/(@world_generator.chunk_size*@world_generator.block_size)).round
+      x = (mouse_x/(@world_generator.chunk_size*@world_generator.block_size)).floor
+      y = (mouse_y/(@world_generator.chunk_size*@world_generator.block_size)).floor
       x = 0 if x < 0
       y = 0 if y < 0
-
 
       unless (@world_generator.chunks.exist?(x, y))
         # puts "cms> #{x}:#{y}"

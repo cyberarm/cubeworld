@@ -15,12 +15,12 @@ class CubeWorld
       @height = height
 
       @interval = 1
-      @persistence, @octaves = rand(0.5..1.0), rand(1.0..10.0)
+      @persistence, @octaves = rand(0.25..0.5), rand(1.0..10.0)
       @generator = Perlin::Generator.new(@seed, @persistence, @octaves)
 
       @chunks = Array2D.new
 
-      @kp = 1.0
+      @kp = (1.0 / 10)
 
       puts "WorldGenerator Seed: #{@seed}, Persistence: #{@persistence}, Octaves: #{@octaves}"
     end
@@ -28,14 +28,13 @@ class CubeWorld
     def generate_chunk(x, y)
       chunk = Chunk.new(x, y, @chunk_size, @block_size)
 
-      @persistence, @octaves = rand(0.5..1.0), rand(1.0..10.0)
-      @seed+=1
+      # @persistence, @octaves = rand(0.5..1.0), rand(1.0..10.0)
       @generator = Perlin::Generator.new(@seed, @persistence, @octaves)
       puts "WorldGenerator Seed: #{@seed}, Persistence: #{@persistence}, Octaves: #{@octaves}"
 
 
-      noise = @generator.chunk(x / @kp, y / @kp, @chunk_size, @chunk_size, @interval) do |n, _x, _y|
-        # p "#{_x.round}:#{_y.round} -> #{n}"
+      noise = @generator.chunk(x * @kp, y * @kp, @chunk_size, @chunk_size, @interval) do |n, _x, _y|
+        # p "#{_x.round}:#{_y.round} -> #{n} (#{n*255})"
         chunk.add_block(_x.round, _y.round, n)
       end
       @chunks.set(x, y, chunk)
