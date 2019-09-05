@@ -9,7 +9,7 @@ class CubeWorld
     end
 
     def initialize
-      super(Gosu.available_width/4*3, Gosu.available_height/4*3, fullscreen: false)
+      super(Gosu.available_width / 4 * 3, Gosu.available_height / 4 * 3, fullscreen: false)
       self.caption = "CubeWorld - A Ruby Voxel Adventure"
 
       @world_generator = WorldGenerator.new
@@ -19,9 +19,9 @@ class CubeWorld
     def draw
       Gosu.draw_rect(self.mouse_x-2, self.mouse_y-2, 4, 4, Gosu::Color::RED, Float::INFINITY) if @_x && @_y
 
-      @font.draw_text("FPS: #{Gosu.fps}", 5, 5, 10, 1,1, Gosu::Color::RED)
-      @font.draw_text("FPS: #{Gosu.fps}", 5.5, 5.5, 10, 1,1, Gosu::Color::WHITE)
-      @font.draw_text("FPS: #{Gosu.fps}", 6, 6, 10, 1,1, Gosu::Color::BLUE)
+      @font.draw_text("FPS: #{Gosu.fps}", 6, 6, 10, 1,1, Gosu::Color::BLACK)
+      @font.draw_text("FPS: #{Gosu.fps}", 5.5, 5.5, 10, 1,1, Gosu::Color::GRAY)
+      @font.draw_text("FPS: #{Gosu.fps}", 5, 5, 10, 1,1, Gosu::Color::WHITE)
       @world_generator.draw_world
     end
 
@@ -30,8 +30,8 @@ class CubeWorld
     end
 
     def chunk_it
-      x = (mouse_x/(@world_generator.chunk_size*@world_generator.block_size)).floor
-      y = (mouse_y/(@world_generator.chunk_size*@world_generator.block_size)).floor
+      x = (mouse_x / (@world_generator.chunk_size * @world_generator.block_size)).floor
+      y = (mouse_y / (@world_generator.chunk_size * @world_generator.block_size)).floor
       x = 0 if x < 0
       y = 0 if y < 0
 

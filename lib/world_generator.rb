@@ -14,13 +14,15 @@ class CubeWorld
       @width = width
       @height = height
 
-      @interval = 1
-      @persistence, @octaves = rand(0.25..0.5), rand(1.0..10.0)
+      @interval = 32
+      @persistence = 0.0173
+      @octaves     = 3
+      @kp = 1.0 / 10.0
+
       @generator = Perlin::Generator.new(@seed, @persistence, @octaves)
 
       @chunks = Array2D.new
 
-      @kp = (1.0 / 10)
 
       puts "WorldGenerator Seed: #{@seed}, Persistence: #{@persistence}, Octaves: #{@octaves}"
     end
@@ -28,14 +30,20 @@ class CubeWorld
     def generate_chunk(x, y)
       chunk = Chunk.new(x, y, @chunk_size, @block_size)
 
-      # @persistence, @octaves = rand(0.5..1.0), rand(1.0..10.0)
       @generator = Perlin::Generator.new(@seed, @persistence, @octaves)
       puts "WorldGenerator Seed: #{@seed}, Persistence: #{@persistence}, Octaves: #{@octaves}"
 
 
-      noise = @generator.chunk(x * @kp, y * @kp, @chunk_size, @chunk_size, @interval) do |n, _x, _y|
-        # p "#{_x.round}:#{_y.round} -> #{n} (#{n*255})"
-        chunk.add_block(_x.round, _y.round, n)
+      _x = 0
+      _y = 0
+      noise = @generator.chunk(x * @kp, y * @kp, @chunk_size, @chunk_size, @interval) do |noise_x, noise_y, noise_z|
+        chunk.add_block(_x, _y, noise_x)
+        _x += 1
+
+        if _x >= @chunk_size
+          _x = 0
+          _y += 1
+        end
       end
       @chunks.set(x, y, chunk)
     end
@@ -50,7 +58,7 @@ class CubeWorld
 
   class Chunk
     def initialize(x, y, chunk_size, block_size)
-      @x,@y = x,y
+      @x,@y = x, y
       @blocks = Array2D.new(chunk_size, chunk_size)
 
       @chunk_size = chunk_size
@@ -78,9 +86,9 @@ class CubeWorld
     end
 
     def draw
-      Gosu.translate(@x*(@block_size*@chunk_size), @y*(@block_size*@chunk_size)) do
+      Gosu.translate(@x * (@block_size + @chunk_size), @y * (@block_size + @chunk_size)) do
 
-        @image ||= Gosu.record(@block_size*@chunk_size, @block_size*@chunk_size) do
+        @image ||= Gosu.record(@block_size + @chunk_size, @block_size + @chunk_size) do
           @blocks.width.times do |x|
             @blocks.height(x).times do |y|
               begin
@@ -89,7 +97,7 @@ class CubeWorld
                 next
               end
 
-              Gosu.draw_rect(x*@block_size, y*@block_size, @block_size, @block_size, color)
+              Gosu.draw_rect(x * @block_size, y * @block_size, @block_size, @block_size, color)
             end
           end
         end
